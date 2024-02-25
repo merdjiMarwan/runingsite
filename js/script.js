@@ -156,6 +156,8 @@ function verifierFormulaire2() {
   var password = document.getElementById("password").value
   var email = document.getElementById("email").value
   var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  var passwordValide = false;
+  var emailValide = false;
  
   if (password == ''  | password.length < 8) {
     document.getElementById("password").classList.add("error");
@@ -174,7 +176,50 @@ function verifierFormulaire2() {
     document.getElementById("email").classList.add("valid");
     document.getElementById("email").classList.remove("error"); 
     }
+
+    if (emailValide && passwordValide) {
+      // Charger le fichier JSON contenant les informations d'identification
+      fetch('accounts.json')
+        .then(response => response.json())
+        .then(data => {
+          // Vérifier si l'email et le mot de passe correspondent à ceux du fichier JSON
+          const user = data.find(user => user.email === email && user.password === mdp);
+          if (user) {
+            // Si les informations d'identification sont valides, afficher la page de bienvenue
+            afficherPageBienvenue(user);
+            console.log('Bienvenue, ', user.nom, "Votre email est : ", user.email, "et votre mot de passe est : ", user.password);
+          } else {
+            // Sinon, afficher un message d'erreur ou effectuer une autre action
+            alert('Email ou mot de passe incorrect.');
+            console.log("Email ou mot de passe incorrect.");
+          }
+        })
+        .catch((error) => {
+          // Handle network errors and exceptions
+          console.error("Une erreur est intervenu : ", error);
+        });
+    }
   }
+  
+  
+  // Fonction pour afficher la page de bienvenue
+  function afficherPageBienvenue(user) {
+    // Récupérer l'élément formulaire de connexion
+    const formulaireConnexion = document.getElementById('formulaire-connexion');
+    
+    // Vérifier si l'élément existe
+    if (formulaireConnexion) {
+      // Cacher le formulaire de connexion
+      formulaireConnexion.style.display = 'none';
+    }
+  
+    // Afficher la page de bienvenue avec les informations de l'utilisateur
+    const welcomeMessage = document.createElement('div');
+    welcomeMessage.classList.add('custom-banniere');
+    welcomeMessage.innerHTML = `<h2>Bienvenue, ${user.nom} !</h2>`;
+    document.body.appendChild(welcomeMessage);
+  }
+  
 
 
 
